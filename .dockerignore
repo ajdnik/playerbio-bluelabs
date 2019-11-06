@@ -1,3 +1,5 @@
 _build
 .gitignore
 README.md
+Dockerfile
+.dockerignore

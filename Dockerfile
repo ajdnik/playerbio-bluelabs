@@ -11,7 +11,7 @@ RUN apk add --no-cache make && \
 ENV MIX_ENV=prod
 
 WORKDIR /app
-ADD . .
+COPY . .
 
 RUN make all
 
@@ -37,11 +37,18 @@ RUN apk add --no-cache \
       ncurses-libs \
       zlib \
       openssl \
-      ca-certificates
+      ca-certificates && \
+    mkdir -p /app && \
+    adduser -s /bin/sh -u 1001 -G root -h /app -S -D default && \
+    chown -R 1001:0 /app
 
 COPY --from=release /app/_build/prod/rel/player_bio /app
 
+RUN chown -R 1001:0 /app
+
 WORKDIR /app
+
+USER default
 
 EXPOSE 8080
 
