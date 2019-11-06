@@ -3,3 +3,4 @@ _build
 README.md
 Dockerfile
 .dockerignore
+helm
