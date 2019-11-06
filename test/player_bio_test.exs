@@ -1,8 +1,8 @@
-defmodule PlayerBioTest do
+defmodule PlayerBioGeneratorTest do
   use ExUnit.Case
-  doctest PlayerBio
+  doctest PlayerBio.Generator
 
-  test "greets the world" do
-    assert PlayerBio.hello() == :world
+  test "generates a map" do
+    assert is_map(PlayerBio.Generator.new())
   end
 end
