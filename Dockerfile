@@ -53,4 +53,3 @@ USER default
 EXPOSE 8080
 
 ENTRYPOINT ["/app/bin/player_bio"]
-CMD ["foreground"]
