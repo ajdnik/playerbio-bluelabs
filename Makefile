@@ -1,4 +1,4 @@
-.PHONY: all deps compile run
+.PHONY: all deps compile run release test clean check
 
 all: deps compile
 
@@ -8,6 +8,18 @@ deps:
 
 compile:
 	mix compile
+
+release:
+	mix release
+
+test:
+	mix test
+
+check:
+	mix format --check-formatted
+
+clean:
+	rm -rf _build
 
 run:
 	iex -S mix
