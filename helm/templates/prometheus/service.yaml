@@ -1,0 +1,22 @@
+{{- if .Values.prometheus.enabled }}
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ template "playerbio.fullname" . }}-prometheus
+  namespace: {{ .Values.prometheus.namespace }}
+  labels:
+    app: {{ template "playerbio.name" . }}
+    chart: {{ template "playerbio.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  type: {{ .Values.prometheus.service.type }}
+  selector:
+    app: prometheus
+    prometheus: {{ template "playerbio.fullname" . }}
+  ports:
+  - protocol: TCP
+    port: {{ .Values.prometheus.service.port }}
+    targetPort: {{ .Values.prometheus.service.targetPort }}
+    name: http
+{{- end }}

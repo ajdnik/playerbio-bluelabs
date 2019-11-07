@@ -1,0 +1,19 @@
+{{- if .Values.prometheus.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: Prometheus
+metadata:
+  name: {{ template "playerbio.fullname" . }}
+  namespace: {{ .Values.prometheus.namespace }}
+spec:
+  serviceMonitorSelector:
+    matchLabels:
+      app: {{ template "playerbio.name" . }}
+      release: {{ .Release.Name }}
+  podMonitorSelector:
+    matchLabels:
+      app: {{ template "playerbio.name" . }}
+      release: {{ .Release.Name }}
+  enableAdminAPI: false
+  serviceAccountName: {{ .Values.prometheus.serviceAccount }}
+  externalUrl: "http://{{ template "playerbio.fullname" . }}-prometheus:9090" 
+{{- end }}

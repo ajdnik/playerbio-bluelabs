@@ -1,0 +1,24 @@
+{{- if .Values.prometheus.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ template "playerbio.fullname" . }}
+  namespace: {{ .Values.prometheus.namespace }}
+  labels:
+    app: {{ template "playerbio.name" . }}
+    chart: {{ template "playerbio.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ template "playerbio.name" . }}
+      release: {{ .Release.Name }}
+  namespaceSelector:
+    matchNames:
+      - {{ .Release.Namespace | quote }}
+  endpoints:
+    - port: http
+      interval: {{ .Values.prometheus.interval }}
+      path: {{ .Values.prometheus.path }}
+{{- end }}
