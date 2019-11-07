@@ -1,0 +1,9 @@
+replicaCount: 5
+
+image:
+  pullPolicy: Never
+
+prometheus:
+  enabled: true
+  namespace: monitor
+  serviceAccount: monitor-prometheus-operato-prometheus
