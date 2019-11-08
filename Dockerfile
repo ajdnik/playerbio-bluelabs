@@ -11,9 +11,14 @@ RUN apk add --no-cache make && \
 ENV MIX_ENV=prod
 
 WORKDIR /app
+COPY mix.* ./
+COPY Makefile ./
+
+RUN make deps
+
 COPY . .
 
-RUN make all
+RUN make compile
 
 #===========
 #Test Stage
