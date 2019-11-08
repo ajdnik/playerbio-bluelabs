@@ -4,6 +4,11 @@ kind: Prometheus
 metadata:
   name: {{ template "playerbio.fullname" . }}
   namespace: {{ .Values.prometheus.namespace }}
+  labels:
+    app: {{ template "playerbio.name" . }}
+    chart: {{ template "playerbio.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
 spec:
   serviceMonitorSelector:
     matchLabels:
@@ -15,5 +20,4 @@ spec:
       release: {{ .Release.Name }}
   enableAdminAPI: false
   serviceAccountName: {{ .Values.prometheus.serviceAccount }}
-  externalUrl: "http://{{ template "playerbio.fullname" . }}-prometheus:9090" 
 {{- end }}

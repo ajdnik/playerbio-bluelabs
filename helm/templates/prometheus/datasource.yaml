@@ -1,0 +1,22 @@
+{{- if .Values.prometheus.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "playerbio.fullname" . }}-datasource
+  namespace: {{ .Values.prometheus.namespace }}
+  labels:
+    grafana_datasource: "1"
+    app: {{ template "playerbio.name" . }}
+    chart: {{ template "playerbio.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+data:
+  datasource.yaml: |-
+    apiVersion: 1
+    datasources:
+    - name: {{ template "playerbio.fullname" . }}
+      type: prometheus
+      url: http://{{ template "playerbio.fullname" . }}-prometheus:{{ .Values.prometheus.service.port }}/
+      access: proxy
+      isDefault: false
+{{- end }}
