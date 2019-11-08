@@ -1,7 +1,5 @@
 #! /usr/bin/env sh
 
-# exit immediately when a command fails
-set -e
 # only exit with zero if all commands of the pipeline exit successfully
 set -o pipefail
 # error on unset variables
@@ -11,58 +9,29 @@ set -u
 if [ ${#@} -ne 0 ] && [ "${@#"--help"}" = "" ]; then
   printf -- 'This script creates a new minikube cluster for the playerbio service.\n';
   printf -- 'If you already have a minikube cluster configured with helm you can skip this script.\n';
-  printf -- 'If you want to suppress subcommand outputs you can use the --silent flag.\n';
-  printf -- 'Usage: ./create.sh --silent\n';
+  printf -- '\nUsage: ./create.sh\n';
   exit 0;
-fi;
-
-# silent output if --silent flag is provided
-error_handle() {
-  stty echo;
-}
-if [ ${#@} -ne 0 ] && [ "${@#"--silent"}" = "" ]; then
-  stty -echo;
-  trap error_handle INT;
-  trap error_handle TERM;
-  trap error_handle KILL;
-  trap error_handle EXIT;
 fi;
 
 # output helper functions
 function warn() {
 	local msg="$1"
-	if [ ${#@} -ne 0 ] && [ "${@#"--silent"}" = "" ]; then
-		stty +echo && printf "\033[33m $msg \033[0m\n" && stty -echo;
-	else
-		printf "\033[33m $msg \033[0m\n";
-	fi;
+	printf "\033[33m $msg \033[0m\n";
 }
 
 function err() {
 	local msg="$1"
-	if [ ${#@} -ne 0 ] && [ "${@#"--silent"}" = "" ]; then
-		stty +echo && printf "\033[31m $msg \033[0m\n" && stty -echo;
-	else
-		printf "\033[31m $msg \033[0m\n";
-	fi;
+	printf "\033[31m $msg \033[0m\n";
 }
 
 function ok() {
 	local msg="$1"
-	if [ ${#@} -ne 0 ] && [ "${@#"--silent"}" = "" ]; then
-		stty +echo && printf "\033[32m \033[1m $msg \033[0m\n" && stty -echo;
-	else
-		printf "\033[32m \033[1m $msg \033[0m\n";
-	fi;
+	printf "\033[32m \033[1m $msg \033[0m\n";
 }
 
 function info() {
 	local msg="$1"
-	if [ ${#@} -ne 0 ] && [ "${@#"--silent"}" = "" ]; then
-		stty +echo && printf "\033[0m \033[1m $msg \033[0m\n" && stty -echo;
-	else
-		printf "\033[0m \033[1m $msg \033[0m\n";
-	fi;
+	printf "\033[0m \033[1m $msg \033[0m\n";
 
 }
 
@@ -94,7 +63,6 @@ if [ "$?" != "0" ]; then
 fi;
 
 info 'STEP 1: Create new minikube cluster.';
-printf '\n';
 minikube start -p playerbio \
   --kubernetes-version=v1.14.5 \
   --memory=4096 \
@@ -103,21 +71,14 @@ minikube start -p playerbio \
   --extra-config=apiserver.authorization-mode=RBAC
 minikube status -p playerbio
 
-info 'STEP 2: Add nginx ingress to minikube.':
-printf '\n';
-minikube addons enable ingress -p playerbio
-
-info 'STEP 3: Create service account for tiller.';
-printf '\n';
+info 'STEP 2: Create service account for tiller.';
 kubectl create serviceaccount tiller --namespace kube-system
 
-info 'STEP 4: Set cluster role for tiller service account.'
-printf '\n';
+info 'STEP 3: Set cluster role for tiller service account.'
 kubectl create clusterrolebinding tiller-role-binding --clusterrole cluster-admin \
   --serviceaccount=kube-system:tiller
 
-info 'STEP 5: Install Tiller';
-printf '\n';
-helm init --service-account tiller
+info 'STEP 4: Install Tiller';
+helm init --service-account tiller --wait
 
 ok 'SUCCESS: MiniKube environment is set up.';

@@ -1,5 +1,6 @@
 replicaCount: 5
 
+# Needed for MiniKube when using local Docker images
 image:
   pullPolicy: Never
 

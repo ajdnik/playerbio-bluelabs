@@ -1,7 +1,5 @@
 #! /usr/bin/env sh
 
-# exit immediately when a command fails
-set -e
 # only exit with zero if all commands of the pipeline exit successfully
 set -o pipefail
 # error on unset variables
@@ -13,60 +11,29 @@ CURR_DIR="$(dirname $0)";
 # print help when --help flag is supplied
 if [ ${#@} -ne 0 ] && [ "${@#"--help"}" = "" ]; then
   printf -- 'This script installs all of the dependencies to the cluster for playerbio service.\n';
-  printf -- 'If you want to suppress subcommand outputs you can use the --silent flag.\n';
-  printf -- 'Usage: ./provision.sh --silent\n';
+  printf -- '\nUsage: ./provision.sh\n';
   exit 0;
-fi;
-
-# silent output if --silent flag is provided
-error_handle() {
-  stty echo;
-	reset;
-}
-if [ ${#@} -ne 0 ] && [ "${@#"--silent"}" = "" ]; then
-  stty -echo;
-  trap error_handle INT;
-  trap error_handle TERM;
-  trap error_handle KILL;
-  trap error_handle EXIT;
 fi;
 
 # output helper functions
 function warn() {
 	local msg="$1"
-	if [ ${#@} -ne 0 ] && [ "${@#"--silent"}" = "" ]; then
-		stty +echo && printf -- "\033[33m $msg \033[0m\n" && stty -echo;
-	else
-		printf -- "\033[33m $msg \033[0m\n";
-	fi;
+	printf -- "\033[33m $msg \033[0m\n";
 }
 
 function err() {
 	local msg="$1"
-	if [ ${#@} -ne 0 ] && [ "${@#"--silent"}" = "" ]; then
-		stty +echo && printf -- "\033[31m $msg \033[0m\n" && stty -echo;
-	else
-		printf -- "\033[31m $msg \033[0m\n";
-	fi;
+	printf -- "\033[31m $msg \033[0m\n";
 }
 
 function ok() {
 	local msg="$1"
-	if [ ${#@} -ne 0 ] && [ "${@#"--silent"}" = "" ]; then
-		stty +echo && printf -- "\033[32m \033[1m $msg \033[0m\n" && stty -echo;
-	else
-		printf -- "\033[32m \033[1m $msg \033[0m\n";
-	fi;
+	printf -- "\033[32m \033[1m $msg \033[0m\n";
 }
 
 function info() {
 	local msg="$1"
-	if [ ${#@} -ne 0 ] && [ "${@#"--silent"}" = "" ]; then
-		stty +echo && printf -- "\033[0m \033[1m $msg \033[0m\n" && stty -echo;
-	else
-		printf -- "\033[0m \033[1m $msg \033[0m\n";
-	fi;
-
+	printf -- "\033[0m \033[1m $msg \033[0m\n";
 }
 
 # check if minikube is installed
@@ -97,36 +64,38 @@ if [ "$?" != "0" ]; then
 fi;
 
 info 'STEP 1: Update helm repository.';
-printf '\n';
 helm repo update
 
 info 'STEP 2: Install prometheus operator.';
-printf '\n';
 helm install stable/prometheus-operator --version=8.1.2 \
   --name=monitor \
   --namespace=monitor \
   --values="${CURR_DIR}/prometheus-operator.yaml"
 
 info 'STEP 3: Setup docker environment.';
-printf '\n';
 minikube docker-env -p playerbio
 eval $(minikube docker-env -p playerbio)
 
 info 'STEP 4: Build project Docker image.';
-printf '\n';
 docker build -t playerbio:latest "${CURR_DIR}/../"
 
 info 'STEP 5: Reset Docker environment.';
-printf '\n';
 minikube docker-env -u -p playerbio
 eval $(minikube docker-env -u -p playerbio)
 
 info 'STEP 6: Deploy project to cluster.';
-printf '\n';
 helm install "${CURR_DIR}/../helm" --name=playerbio \
   --values="${CURR_DIR}/playerbio.yaml"
 
-printf '\nPlayerbio service URL: ';
-minikube service playerbio -p playerbio --url
+# Datasources are loaded on initialization of grafana pods so we need to manually add it to grafana
+GRAFANA_URL=$(minikube service monitor-grafana -n monitor -p playerbio --url)
+info 'STEP 7: Add datasource to grafana.';
+curl -v -X POST -H "Authorization: Basic YWRtaW46cHJvbS1vcGVyYXRvcg==" -H "Accept: application/json" -H "Content-Type: application/json" -d '{"name":"playerbio", "type":"prometheus", "access":"proxy", "url":"http://playerbio-prometheus:9090/"}' "${GRAFANA_URL}/api/datasources"
 
+SERVICE_URL=$(minikube service playerbio -p playerbio --url);
 ok 'SUCCESS: Playerbio service deployed to cluster.';
+ok "Playerbio url is ${SERVICE_URL}.";
+ok 'Grafana:';
+ok 'Username: admin';
+ok 'Password: prom-operator';
+ok "Url: ${GRAFANA_URL}";
