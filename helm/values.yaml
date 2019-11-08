@@ -7,10 +7,10 @@ image:
   tag: latest
   pullPolicy: IfNotPresent
 
-# Pod arguments
+# pod arguments
 args: ["start"]
 
-# Pod environment variables
+# pod environment variables
 env: []
 # - name: MIX_ENV
 #   value: prod
@@ -20,7 +20,7 @@ resources: {}
 #   cpu: 10m
 #   memory: 32Mi
 
-# Pod Security Context
+# pod security context
 # ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
 securityContext:
   enabled: true
@@ -46,8 +46,8 @@ probes:
 prometheus:
   enabled: false
   namespace: default
-  interval: "15s"
-  path: "/metrics"
+  interval: 15s
+  path: /metrics
   serviceAccount: default
   service:
     type: ClusterIP

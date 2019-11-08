@@ -1,9 +1,9 @@
-# Grafana service setup to expose via MiniKube
+# grafana service setup to expose via minikube
 grafana:
   service:
     type: NodePort
 
-# Service monitor selectors for Kubernetes components in MiniKube
+# service monitor selectors for kubernetes components in minikube
 coreDns:
   service:
     selector:

@@ -45,14 +45,14 @@ spec:
         env:
 {{ toYaml .Values.env | indent 10 }}
         {{- end }}
-				{{- if .Values.resources }}
+        {{- if .Values.resources }}
         resources:
 {{ toYaml .Values.resources | nindent 10 }}
         {{- end }}
         ports:
           - name: http
             containerPort: {{ .Values.httpPort }}
-				{{- if .Values.probes.enabled }}
+        {{- if .Values.probes.enabled }}
         livenessProbe:
           httpGet:
             path: {{ .Values.probes.liveness.path }}
@@ -61,4 +61,4 @@ spec:
           httpGet:
             path: {{ .Values.probes.readiness.path }}
             port: http
-				{{- end }}
+        {{- end }}
