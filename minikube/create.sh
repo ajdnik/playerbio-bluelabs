@@ -103,16 +103,20 @@ minikube start -p playerbio \
   --extra-config=apiserver.authorization-mode=RBAC
 minikube status -p playerbio
 
-info 'STEP 2: Create service account for tiller.';
+info 'STEP 2: Add nginx ingress to minikube.':
+printf '\n';
+minikube addons enable ingress -p playerbio
+
+info 'STEP 3: Create service account for tiller.';
 printf '\n';
 kubectl create serviceaccount tiller --namespace kube-system
 
-info 'STEP 3: Set cluster role for tiller service account.'
+info 'STEP 4: Set cluster role for tiller service account.'
 printf '\n';
 kubectl create clusterrolebinding tiller-role-binding --clusterrole cluster-admin \
   --serviceaccount=kube-system:tiller
 
-info 'STEP 4: Install Tiller';
+info 'STEP 5: Install Tiller';
 printf '\n';
 helm init --service-account tiller
 
