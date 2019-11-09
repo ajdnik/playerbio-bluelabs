@@ -27,32 +27,38 @@ exists 'docker' 'https://docs.docker.com/install/';
 info 'STEP 1: Update helm repository.';
 helm repo update
 
-info 'STEP 2: Install prometheus operator.';
+info 'STEP 2: Install splunk enterprise.';
+helm install "{CURR_DIR}/splunk" \
+  --name=splunk \
+  --namespace=splunk \
+  --values="${CURR_DIR}/splunk.yaml"
+
+info 'STEP 3: Install prometheus operator.';
 helm install stable/prometheus-operator \
   --version=8.1.2 \
   --name=monitor \
   --namespace=monitor \
   --values="${CURR_DIR}/prometheus-operator.yaml"
 
-info 'STEP 3: Setup docker environment.';
+info 'STEP 4: Setup docker environment.';
 minikube docker-env -p playerbio
 eval $(minikube docker-env -p playerbio)
 
-info 'STEP 4: Build project Docker image.';
+info 'STEP 5: Build project Docker image.';
 docker build -t playerbio:latest "${CURR_DIR}/../"
 
-info 'STEP 5: Reset Docker environment.';
+info 'STEP 6: Reset Docker environment.';
 minikube docker-env -u -p playerbio
 eval $(minikube docker-env -u -p playerbio)
 
-info 'STEP 6: Deploy project to cluster.';
+info 'STEP 7: Deploy project to cluster.';
 helm install "${CURR_DIR}/../helm" --name=playerbio \
   --values="${CURR_DIR}/playerbio.yaml"
 
 # datasources are loaded on initialization of grafana pods so, 
 # we need to manually add it to grafana
 GRAFANA_URL=$(minikube service monitor-grafana -n monitor -p playerbio --url)
-info 'STEP 7: Add datasource to grafana.';
+info 'STEP 8: Add datasource to grafana.';
 curl -v -X POST \
   -H "Authorization: Basic YWRtaW46cHJvbS1vcGVyYXRvcg==" \
   -H "Accept: application/json" \

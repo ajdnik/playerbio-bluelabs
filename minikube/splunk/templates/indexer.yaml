@@ -1,0 +1,66 @@
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: {{ template "splunk.fullname" . }}-indexer
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    app: {{ template "splunk.name" . }}-indexer
+    chart: {{ template "splunk.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.indexer.replicaCount }}
+  serviceName: {{ template "splunk.fullname" . }}-indexer
+  template:
+    metadata:
+      labels:
+        app: {{ template "splunk.name" . }}-indexer
+        release: {{ .Release.Name }}
+    spec:
+      dnsPolicy: ClusterFirst
+      dnsConfig:
+        searches:
+          - "{{ template "splunk.name" . }}-indexer.{{ .Release.Namespace }}.svc.cluster.local"
+      containers:
+        - name: indexer
+          image: "{{ .Values.image.name }}:{{ .Values.image.tag }}"
+          env:    
+            - name: SPLUNK_HOME
+              value: /opt/splunk
+            - name: SPLUNK_DEFAULTS_URL
+              value: "http://{{ template "splunk.fullname" . }}-defaults/default.yml"
+            - name: SPLUNK_START_ARGS
+              value: "--accept-license"
+            - name: SPLUNK_ROLE
+              value: splunk_indexer
+            - name: SPLUNK_CLUSTER_MASTER_URL
+              value: {{ template "splunk.fullname" . }}-master
+            - name: SPLUNK_INDEXER_URL
+              value: {{ template "splunk.indexerNodes" . }}
+            - name: SPLUNK_SEARCH_HEAD_URL
+              value: {{ template "splunk.fullname" . }}-search
+            - name: SPLUNK_PASSWORD
+              value: {{ .Values.password }}
+            - name: DEBUG
+              value: "true"
+          ports:
+            - name: web
+              containerPort: 8000
+            - name: hec
+              containerPort: 8088
+            - name: mgmt
+              containerPort: 8089
+            - name: s2s
+              containerPort: 9997
+            - name: rep
+              containerPort: 4001 
+          volumeMounts:
+            - name: splunk-idxcluster-config  
+              mountPath: /opt/splunk/etc
+            - name: splunk-idxcluster-data
+              mountPath: /opt/splunk/var
+      volumes:
+        - name: splunk-idxcluster-config
+          emptyDir: {}
+        - name: splunk-idxcluster-data
+          emptyDir: {}

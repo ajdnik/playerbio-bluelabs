@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "splunk.fullname" . }}-defaults
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    app: {{ template "splunk.name" . }}-defaults
+    chart: {{ template "splunk.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ template "splunk.name" . }}-defaults
+      release: {{ .Release.Name }}
+  replicas: {{ .Values.nginx.replicaCount }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "splunk.name" . }}-defaults
+        release: {{ .Release.Name }}
+    spec:
+      containers:
+      - name: nginx
+        image: "{{ .Values.nginx.image.name }}:{{ .Values.nginx.image.tag }}"
+        ports:
+        - name: http
+          containerPort: 80
+        volumeMounts:
+        - name: nginx-config
+          mountPath: /etc/nginx/conf.d
+        - name: nginx-data-www
+          mountPath: /data/www
+      volumes:
+      - name: nginx-config
+        configMap:
+          name: {{ template "splunk.fullname" . }}-nginx 
+      - name: nginx-data-www
+        configMap: 
+          name: {{ template "splunk.fullname" . }}-www-data 

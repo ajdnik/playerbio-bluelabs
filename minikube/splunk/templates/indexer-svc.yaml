@@ -1,0 +1,35 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "splunk.fullname" . }}-indexer
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    app: {{ template "splunk.name" . }}-indexer
+    chart: {{ template "splunk.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  type: {{ .Values.indexer.service.type }}
+  {{- if eq .Values.indexer.service.type "ClusterIP" }}
+  clusterIP: None
+  {{- end }}
+  selector:
+    app: {{ template "splunk.name" . }}-indexer
+    release: {{ .Release.Name }}
+  ports:
+    - name: splunkweb
+      port: {{ .Values.indexer.service.splunkwebPort }}
+      targetPort: web
+    - name: splunkd
+      port: {{ .Values.indexer.service.splunkdPort }}
+      targetPort: mgmt
+    - name: hec
+      port: {{ .Values.indexer.service.hecPort }}
+      targetPort: hec
+    - name: replication
+      port: {{ .Values.indexer.service.replicationPort }}
+      targetPort: rep
+    - name: s2s
+      port: {{ .Values.indexer.service.s2sPort }}
+      targetPort: s2s

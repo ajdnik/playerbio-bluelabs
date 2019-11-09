@@ -1,0 +1,63 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ template "splunk.fullname" . }}-search
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    app: {{ template "splunk.name" . }}-search
+    chart: {{ template "splunk.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.search.replicaCount }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "splunk.name" . }}-search
+        release: {{ .Release.Name }}
+    spec:
+      hostname: {{ template "splunk.fullname" . }}-search
+      dnsPolicy: ClusterFirst
+      dnsConfig:
+        searches:
+          - "{{ template "splunk.name" . }}-indexer.{{ .Release.Namespace }}.svc.cluster.local"
+      containers:
+        - name: search
+          image: "{{ .Values.image.name }}:{{ .Values.image.tag }}"
+          env:
+            - name: SPLUNK_HOME
+              value: /opt/splunk
+            - name: SPLUNK_DEFAULTS_URL
+              value: "http://{{ template "splunk.fullname" . }}-defaults/default.yml"
+            - name: SPLUNK_ROLE
+              value: splunk_search_head
+            - name: SPLUNK_PASSWORD
+              value: {{ .Values.password }}
+            - name: SPLUNK_START_ARGS
+              value: "--accept-license"
+            - name: SPLUNK_CLUSTER_MASTER_URL
+              value: {{ template "splunk.fullname" . }}-master
+            - name: SPLUNK_INDEXER_URL
+              value: {{ template "splunk.indexerNodes" . }}
+            - name: SPLUNK_SEARCH_HEAD_URL
+              value: {{ template "splunk.fullname" . }}-search
+            - name: DEBUG
+              value: "true"
+          ports:
+            - name: web
+              containerPort: 8000
+            - name: mgmt
+              containerPort: 8089
+            - name: kv
+              containerPort: 8191
+          volumeMounts:
+            - name: splunk-search-data
+              mountPath: /opt/splunk/var
+            - name: splunk-search-config
+              mountPath: /opt/splunk/etc
+      volumes:
+        - name: splunk-search-config
+          emptyDir: {}
+        - name: splunk-search-data
+          emptyDir: {}

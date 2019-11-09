@@ -1,0 +1,39 @@
+nginx:
+  replicaCount: 1
+  image:
+    name: nginx
+    tag: "1.17"
+  service:
+    type: ClusterIP
+    port: 80
+
+password: helloworld
+
+image:
+  name: splunk/splunk
+  tag: "7.2"
+
+indexer:
+  replicaCount: 1
+  service:
+    type: ClusterIP
+    splunkwebPort: 8000
+    splunkdPort: 8089
+    hecPort: 8088
+    replicationPort: 4001
+    s2sPort: 9997
+
+master:
+  replicaCount: 1
+  service:
+    type: ClusterIP
+    splunkwebPort: 8000
+    splunkdPort: 8089
+
+search:
+  replicaCount: 1
+  service:
+    type: ClusterIP
+    splunkwebPort: 8000
+    splunkdPort: 8089
+    kvPort: 8191

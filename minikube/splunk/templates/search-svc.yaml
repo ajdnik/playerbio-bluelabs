@@ -1,0 +1,29 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "splunk.fullname" . }}-search
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    app: {{ template "splunk.name" . }}-search
+    chart: {{ template "splunk.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  type: {{ .Values.search.service.type }}
+  {{- if eq .Values.search.service.type "ClusterIP" }}
+  clusterIP: None
+  {{- end }}
+  selector:
+    app: {{ template "splunk.name" . }}-search
+    release: {{ .Release.Name }}
+  ports:
+    - name: splunkweb
+      port: {{ .Values.search.service.splunkwebPort }} 
+      targetPort: web
+    - name: splunkd
+      port: {{ .Values.search.service.splunkdPort }} 
+      targetPort: mgmt
+    - name: kv
+      port: {{ .Values.search.service.kvPort }} 
+      targetPort: kv
