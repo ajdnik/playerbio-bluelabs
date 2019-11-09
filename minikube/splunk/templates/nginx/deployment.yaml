@@ -30,7 +30,9 @@ spec:
         - name: nginx-config
           mountPath: /etc/nginx/conf.d
         - name: nginx-data-www
-          mountPath: /data/www
+          mountPath: /data/www/defaults
+        - name: nginx-data-apps
+          mountPath: /data/www/apps
       volumes:
       - name: nginx-config
         configMap:
@@ -38,3 +40,6 @@ spec:
       - name: nginx-data-www
         configMap: 
           name: {{ template "splunk.fullname" . }}-www-data 
+      - name: nginx-data-apps
+        configMap: 
+          name: {{ template "splunk.fullname" . }}-k8s-app

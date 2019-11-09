@@ -28,7 +28,7 @@ spec:
             - name: SPLUNK_HOME
               value: /opt/splunk
             - name: SPLUNK_DEFAULTS_URL
-              value: "http://{{ template "splunk.fullname" . }}-defaults/default.yml"
+              value: "http://{{ template "splunk.fullname" . }}-defaults/defaults/default.yml"
             - name: SPLUNK_START_ARGS
               value: "--accept-license"
             - name: SPLUNK_ROLE
