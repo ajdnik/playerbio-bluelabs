@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ .Release.Name }}-ping-endpoint-test"
+  annotations:
+    "helm.sh/hook": test-success
+spec:
+  containers:
+  - name: {{ .Release.Name }}-ping-endpoint-test
+    image: buildpack-deps:curl
+    args:
+    - "/bin/sh"
+    - "-ec"
+    - "curl -v http://${{ "{" }}{{ (include "playerbio.name" .) | upper }}_SERVICE_HOST}:${{ "{" }}{{ (include "playerbio.name" .) | upper }}_SERVICE_PORT}/ping"
+  restartPolicy: Never
