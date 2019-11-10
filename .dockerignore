@@ -1,7 +1,14 @@
-_build
-.gitignore
-README.md
+# Docker files
 Dockerfile
 .dockerignore
+
+# Mix build artifacts
+_build
+
+# Git files
+.gitignore
+README.md
+
+# DevOps folders
 helm
-provision
+minikube

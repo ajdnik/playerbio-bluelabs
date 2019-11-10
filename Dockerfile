@@ -1,6 +1,6 @@
-#===========
-#Build Stage
-#===========
+############################################################
+# Build Stage
+############################################################
 FROM elixir:1.9-alpine as build
 
 # Install dependencies
@@ -11,30 +11,31 @@ RUN apk add --no-cache make && \
 ENV MIX_ENV=prod
 
 WORKDIR /app
+
+# Separate dependency install from code compilation
+# to leverage Docker's layer caching
 COPY mix.* ./
 COPY Makefile ./
-
 RUN make deps
 
 COPY . .
-
 RUN make compile
 
-#===========
-#Test Stage
-#===========
+############################################################
+# Test Stage
+############################################################
 FROM build as test
 RUN make check && make test
 
-#===========
-#Release Stage
-#===========
+############################################################
+# Release Stage
+############################################################
 FROM build as release
 RUN make release
 
-#===========
-#Deployment Stage
-#=========== 
+############################################################
+# Deployment Stage
+############################################################
 FROM alpine:3.10
 
 # Installing dependencies based on https://github.com/bitwalker/alpine-erlang
