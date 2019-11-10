@@ -1,5 +1,8 @@
+# https://helm.sh/docs/charts/#the-chart-yaml-file
 apiVersion: v1
-description: An example Elixir service
 name: playerbio
-appVersion: 0.1.1
-version: 0.1.1
+# a semver chart version
+version: 0.1.0
+description: An example Elixir service
+# the version of the app it deploys
+appVersion: 0.1.0

@@ -1,41 +1,73 @@
+# Default values for playerbio.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+## Define the port where the service is listening.
+##
 httpPort: 8080
 
+## Number of service instances to create in the deployment.
+##
 replicaCount: 1
 
+## Docker image properties.
+##
 image:
   repository: playerbio
   tag: latest
   pullPolicy: IfNotPresent
 
-# pod arguments
+## Docker image arguments
+##
 args: ["start"]
 
-# pod environment variables
+## Docker environment variables
+##
 env: []
 # - name: MIX_ENV
 #   value: prod
 
+## Define resources requests and limits for single Pods.
+## ref: https://kubernetes.io/docs/user-guide/compute-resources/
+##
 resources: {}
 # requests:
 #   cpu: 10m
 #   memory: 32Mi
 
-# pod security context
-# ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+## SecurityContext holds pod-level security attributes and common container settings.
+## This defaults to non root user with uid 1000 and gid 2000.	*v1.PodSecurityContext	false
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+##
 securityContext:
   enabled: true
   fsGroup: 1001
   runAsUser: 1001
   allowPrivEsc: false
 
+## Annotations for service pods.
+##
 podAnnotations: {}
 
+## Additional labels for service pods.
+##
 podLabels: {}
 
+## Configuration for playerbio service.
+##
 service:
+  ## Service type
+  ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types
+  ##
   type: NodePort
+
+  ## Port for service to listen on
+  ##
   port: 80
 
+## Health check configuration.
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+##
 probes:
   enabled: true
   liveness:
@@ -43,12 +75,23 @@ probes:
   readiness:
     path: /ping
 
+## Prometheus operator configuration.
+##
 prometheus:
   enabled: false
-  namespace: default
-  interval: 15s
-  path: /metrics
   serviceAccount: default
+
+  ## Namespace where operator is installed
+  ##
+  namespace: default
+
+  ## Prometheus metrics endpoint
+  ##
+  path: /metrics
+  interval: 15s
+
+  ## Configuration for prometheus operator service
+  ##
   service:
     type: ClusterIP
     port: 9090
