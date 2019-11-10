@@ -16,5 +16,5 @@ if [ ${#@} -ne 0 ] && [ "${@#"--help"}" = "" ]; then
   exit 0;
 fi;
 
-# generate app archive
+# generate app archive and output it to stdout base 64 encoded
 cd $CURR_DIR && tar -zcb 1 - ./k8s-app | base64

@@ -1,6 +1,7 @@
-# deployment based on: https://github.com/splunk/docker-splunk/tree/develop/test_scenarios/kubernetes
+# Splunk Enterprise Helm chart
+# ref: https://github.com/splunk/docker-splunk/tree/develop/test_scenarios/kubernetes
 apiVersion: v1
-description: Splunk Enterprise simple deployment
 name: splunk
-appVersion: 7.2.9
 version: 0.1.0
+description: Splunk Enterprise simple deployment
+appVersion: 7.2.9
