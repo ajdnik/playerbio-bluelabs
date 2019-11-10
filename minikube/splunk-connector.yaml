@@ -1,4 +1,4 @@
-#global settings
+# Global settings
 global:
   logLevel: info 
   splunk:
@@ -6,20 +6,17 @@ global:
       protocol: https
       insecureSSL: true
       host: splunk-indexer
+      # Token used for MiniKube cluster
       token: 312aeeca-199b-4d96-ad28-7d8968955533
 
-
-
-#local config for logging chart
+# Local config for logging chart
 splunk-kubernetes-logging:
   journalLogPath: /run/log/journal
   splunk:
     hec:
       indexName: cm_events 
 
-
-
-#local config for objects chart      
+# Local config for objects chart      
 splunk-kubernetes-objects:
   rbac:
     create: true
@@ -66,8 +63,8 @@ splunk-kubernetes-objects:
   splunk:
     hec:
       indexName: cm_meta    
-          
-#local config for metrics chart
+    
+# Local config for metrics chart
 splunk-kubernetes-metrics:
   rbac:
     create: true

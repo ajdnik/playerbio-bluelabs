@@ -62,10 +62,12 @@ info 'STEP 8: Deploy project to cluster.';
 helm install "${CURR_DIR}/../helm" --name=playerbio \
   --values="${CURR_DIR}/playerbio.yaml"
 
-# datasources are loaded on initialization of grafana pods so, 
-# we need to manually add it to grafana
+info 'STEP 9: Test project deployment.';
+helm test playerbio
+
+# datasources are loaded on initialization of grafana pods so, we need to manually add it to grafana
 GRAFANA_URL=$(minikube service monitor-grafana -n monitor -p playerbio --url)
-info 'STEP 9: Add datasource to grafana.';
+info 'STEP 10: Add datasource to grafana.';
 curl -v -X POST \
   -H "Authorization: Basic YWRtaW46cHJvbS1vcGVyYXRvcg==" \
   -H "Accept: application/json" \

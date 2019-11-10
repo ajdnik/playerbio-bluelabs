@@ -1,9 +1,11 @@
+# Replica count increased to 5 instances
 replicaCount: 5
 
-# needed for minikube when using local docker images
+# Needed for MiniKube when using local Docker images
 image:
   pullPolicy: Never
 
+# Custom configuration for MiniKube Prometheus Operator
 prometheus:
   enabled: true
   namespace: monitor

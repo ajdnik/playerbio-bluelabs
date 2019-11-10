@@ -1,4 +1,4 @@
-# configure master service type for minikube access
+# Configure master service type for MiniKube access
 master:
   service:
     type: NodePort
