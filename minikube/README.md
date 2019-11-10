@@ -70,8 +70,10 @@ To deploy [Splunk Enterprise](https://www.splunk.com/en_us/software/splunk-enter
 
 In the end the script outputs URLs and credentials for the [Elixir](https://elixir-lang.org/) service, [Grafana](https://grafana.com/) and [Splunk Enterprise](https://www.splunk.com/en_us/software/splunk-enterprise.html) web UI.
 
-<details><summary>Long command output:</summary>
+<details>
+<summary>Script usage:</summary>
 <p>
+
 ```bash
 ./provision.sh
   STEP 1: Update helm repository.
@@ -824,6 +826,7 @@ Playerbio microservice has been installed. Check its status by running:
   SUCCESS: Service deployed to cluster.
   Playerbio url is http://192.168.64.21:30871.
 ```
+
 </p>
 </details>
 
